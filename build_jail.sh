@@ -4,7 +4,7 @@
 #The root user generates backup files through a cron job and the user below connects to the Jailed folder and a seperate server connects and runs rsync to pull the data
 
 
-#script assumes you have already created a user (in this case named) rbackup and is the home directory
+#script assumes you have already created a user (in this case named) mybackup and is the home directory
 JAIL=/home/mybackups
 USER=mybackups
 
