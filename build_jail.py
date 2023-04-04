@@ -6,7 +6,7 @@ import subprocess
 
 #create a user and save the location of the jail to a variable
 username = input("Please enter a username, the user will be put in the /home directory: ")
-subprocess.call('adduser', username)
+subprocess.call('sudo adduser', username)
 jail = '/home/' + username
 
 
