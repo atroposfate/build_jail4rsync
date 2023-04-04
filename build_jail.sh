@@ -38,6 +38,8 @@ sudo cp /lib/x86_64-linux-gnu/libcrypto.so.1.1 $JAIL/lib/x86_64-linux-gnu/
 sudo cp /lib/x86_64-linux-gnu/libc.so.6 $JAIL/lib/x86_64-linux-gnu/
 sudo cp /lib/x86_64-linux-gnu/libdl.so.2 $JAIL/lib/x86_64-linux-gnu/
 sudo cp /lib/x86_64-linux-gnu/libpthread.so.0 $JAIL/lib/x86_64-linux-gnu/
+sudo cp /lib/x86_64-linux-gnu/libattr.so.1 $JAIL/lib/x86_64-linux-gnu/
+
 
 sudo chown root:root $JAIL
 
