@@ -5,12 +5,12 @@
 
 
 #script assumes you have already created a user (in this case named) mybackup and is the home directory
+#UPDATE THESE TWO VARIABLES TO SUIT YOUR NEEDS
 JAIL=/home/mybackups
 USER=mybackups
 
 sudo mkdir $JAIL/usr $JAIL/bin $JAIL/lib $JAIL/lib64
-sudo mkdir $JAIL/lib/x86_64-linux-gnu $JAIL/lib64/x86_64-linux-gnu
-sudo mkdir $JAIL/usr/bin
+sudo mkdir $JAIL/lib/x86_64-linux-gnu $JAIL/lib64/x86_64-linux-gnu $JAIL/usr/bin
 
 sudo cp $(which ls) $JAIL/bin
 sudo cp $(which bash) $JAIL/bin
