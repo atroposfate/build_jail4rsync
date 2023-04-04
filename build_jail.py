@@ -28,6 +28,7 @@ while True:
      #if everything passes then add the command to the array
        commands.append(newcommand)
 
+#testing code to make sure the commands are getting captured
 for x in commands:
   print(x)
 
