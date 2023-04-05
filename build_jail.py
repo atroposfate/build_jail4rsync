@@ -1,17 +1,20 @@
 #!/bin/python3
 #Incomplete python script that does the same things but smarter
-
+import time
 import re
 import subprocess
 
 #create a user and save the location of the jail to a variable
 username = input("Please enter a username, the user will be put in the /home directory: ")
-subprocess.call('sudo adduser', username)
+print("This username is being passed to linux adduser please complete the the setup\n")
+time.sleep(4)
+subprocess.run(['sudo','adduser',username])
 jail = '/home/' + username
-
+#for testing to avoid the creation
+#jail = '/home/test'
 
 commands = ['ls','bash','rsync']
-print('Welcome to the chroot jail creator we have added ls, bash and rsync if you would like to add more please enter them below, one at a time and enter a blank')
+print('\n\nWelcome to the chroot jail creator we have added ls, bash and rsync if you would like to add more please enter them below, one at a time and press enter when done')
 print('Examples could be cp, rm etc..')
 
 while True:
@@ -33,9 +36,10 @@ for x in commands:
   print(x)
 
 #Make the necessary directories (need to add some code here to check if the directory still exists)
-tree = ['/bin','/usr','/lib','/lib64','/usr/bin']
+tree = ['/bin','/usr','/lib','/lib64','/usr/bin','/lib/x86_64-linux-gnu','/lib64/x86_64-linux-gnu']
 for i in tree:
-   subprocess.call('sudo mkdir', jail+i)
+   print(jail+i)
+   subprocess.run(['sudo','mkdir',jail+i])
 
 
 #Once the commands have been created then the library files are generated
