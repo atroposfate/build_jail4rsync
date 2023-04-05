@@ -4,14 +4,30 @@ import time
 import re
 import subprocess
 
+def yes_or_no(question):
+      reply = str(input(question+' [Y/n]: ')).lower().strip()
+      try: 
+        if reply[:1] == 'y' or reply == "":
+            return True
+        if reply[:1] == 'n':
+            return False
+        else:
+           print('Invalid Input')
+           return  yes_or_no(question)
+      except Exception as error:
+         print("Please enter valid input")
+         print(error)
+         return yes_or_no(question)
+
 #create a user and save the location of the jail to a variable
 username = input("Please enter a username, the user will be put in the /home directory: ")
-print("This username is being passed to linux adduser please complete the the setup\n")
-time.sleep(4)
-subprocess.run(['sudo','adduser',username])
+if yes_or_no("Does this username need to be created?"):
+   print("This username is being passed to linux adduser please complete the the setup\n")
+   time.sleep(4)
+   subprocess.run(['sudo','adduser',username])
+
 jail = '/home/' + username
-#for testing to avoid the creation
-#jail = '/home/test'
+
 
 commands = ['ls','bash','rsync']
 print('\n\nWelcome to the chroot jail creator we have added ls, bash and rsync if you would like to add more please enter them below, one at a time and press enter when done')
