@@ -36,6 +36,8 @@ if yes_or_no("Does this user need to be created?"):
    subprocess.run(['adduser',username])
 
 jail = '/home/' + username
+#Need this to be done so the chroot works
+subprocess.run(['chown','root:root',jail])
 
 #Pre determined commands for the jail but additional can be added
 commands = ['ls','bash','rsync']
@@ -56,10 +58,15 @@ while True:
        commands.append(newcommand)
 
 #Make the necessary directories. Some of these are overkill and often not used but better safe than sorry
-tree = ['/bin','sbin','/usr','/lib','/lib64','/usr/bin','/lib/x86_64-linux-gnu','/lib64/x86_64-linux-gnu','/usr/sbin/']
+tree = ['/bin','/sbin','/usr','/lib','/lib64','/usr/bin','/lib/x86_64-linux-gnu','/lib64/x86_64-linux-gnu','/usr/sbin','/root','/backups']
 for i in tree:
    print(jail+i)
    subprocess.run(['mkdir',jail+i])
+
+#This needs to be here and sometimes it goes to the wrong location
+subprocess.run(['cp','/bin/bash',jail+'/bin/'])
+#needs somewhere for the jail person to access
+subprocess.run(['chown',username+':'+username,jail+'/root',jail+'/backups'])
 
 
 for x in commands:
@@ -77,8 +84,8 @@ print("\nFiles needed for the chroot jail have been created in the necessary fol
 chtext = '\nMatch User ' + username+'\nChrootDirectory ' +jail
 
 #Add the necessary data to the sshd file
-if yes_or_no("You will need to add some lines to your sshd_config file for this to work, would you like me to do that?"):
-   ssh_loc = input("Assuming the location is /etc/ssh/sshd_config, please provide alternate path if incorrect")
+if yes_or_no("\nYou will need to add some lines to your sshd_config file for this to work, would you like me to do that?"):
+   ssh_loc = input("Assuming the location is /etc/ssh/sshd_config, please provide alternate path if incorrect: ")
    if ssh_loc == '':
      ssh_loc='/etc/ssh/sshd_config'
 
@@ -87,6 +94,6 @@ if yes_or_no("You will need to add some lines to your sshd_config file for this 
    file_object.close()
    subprocess.run(['systemctl','restart','sshd'])
 else:
-   print("Don't forget to add the following to your sshd config file"+chtext)
+   print("\nDon't forget to add the following to your sshd config file"+chtext)
 
-print("\n\nDone!")
+print("\n\nDone!\nBy default you will only be able to write to /root and /backups folder")
