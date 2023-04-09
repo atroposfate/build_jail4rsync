@@ -27,7 +27,51 @@ def yes_or_no(question):
          print(error)
          return yes_or_no(question)
 
-#create a user and save the location of the jail to a variable
+#more consice ssh work 
+def ssh_conf(sshloc,uname,jailing):
+     if yes_or_no("Would you like to add the user to the sshd file?"):
+        chtext = '\nMatch User ' + uname+'\nChrootDirectory ' +jailing +"\n"
+        if yes_or_no("Is your sshd file located in "+sshloc):
+          pass
+        else:
+          sshloc=input("Please provide the full path for the file: ")
+        try:
+          file_object = open(sshloc,'a')
+
+        except FileNotFound as error:
+          print("File Not Found at " + sshloc+", it will start over" )
+          print(error)
+          return ssh_conf(sshloc,uname,jailing)
+
+        file_object.write(chtext)
+        file_object.close()
+        subprocess.run(['systemctl','restart','sshd'])
+     else:
+        print("\nDon't forget to add the user to you sshd file")
+
+#create all the directories and permissions
+def createdir(jailing,uname):
+   tree = ['/bin','/sbin','/usr','/lib','/lib64','/usr/bin','/lib/x86_64-linux-gnu','/lib64/x86_64-linux-gnu','/usr/sbin','/root','/backups']
+   print("These directories are created: ")
+   for i in tree:
+     print(jailing+i)
+     subprocess.run(['mkdir',jailing+i])
+#setup the permissions for the folders
+   subprocess.run(['cp','/bin/bash',jailing+'/bin/'])
+   subprocess.run(['chown',uname+':'+uname,jailing+'/root',jailing+'/backups'])
+
+def getlibs(program):
+   #determin all the libraries for these functions and isolate them in an array
+   libtext = subprocess.run(['ldd',program], capture_output=True, text=True).stdout.strip("\n")
+   libfiles = re.findall(r"(\/.*?)(?=\s)", libtext)
+   return libfiles
+
+#want to tidy up the create user and avoid the uncessary adduser and user useradd
+def createuser(uname):
+   subprocess.run(['useradd','-m','/home/'+uname,'-p',input("Enter new password"),'-s','/bin/bash',uname])
+
+
+#create a user and save the location of the jail to a variable0
 username = input("Please enter a username, the user will be put in the /home directory: ")
 
 if yes_or_no("Does this user need to be created?"):
@@ -58,42 +102,20 @@ while True:
        commands.append(newcommand)
 
 #Make the necessary directories. Some of these are overkill and often not used but better safe than sorry
-tree = ['/bin','/sbin','/usr','/lib','/lib64','/usr/bin','/lib/x86_64-linux-gnu','/lib64/x86_64-linux-gnu','/usr/sbin','/root','/backups']
-for i in tree:
-   print(jail+i)
-   subprocess.run(['mkdir',jail+i])
+createdir(jail,username)
 
-#This needs to be here and sometimes it goes to the wrong location
-subprocess.run(['cp','/bin/bash',jail+'/bin/'])
-#needs somewhere for the jail person to access
-subprocess.run(['chown',username+':'+username,jail+'/root',jail+'/backups'])
-
-
+#get all the dependancies
 for x in commands:
    whr = subprocess.run(['which',x], capture_output=True, text=True).stdout.strip("\n")
    subprocess.run(['cp',whr,jail+whr])
-   #determin all the libraries for these functions and isolate them in an array
-   libtext = subprocess.run(['ldd',whr], capture_output=True, text=True).stdout.strip("\n")
-   libfiles = re.findall(r"(\/.*?)(?=\s)", libtext)
-   #once the libraries are identified then copy them into the jail
+   libfiles = getlibs(whr)
    for y in libfiles:
       subprocess.run(['cp',y,jail+y])
 
 print("\nFiles needed for the chroot jail have been created in the necessary folders please note the errors as some files or libraries may not have copied successfully")
 
-chtext = '\nMatch User ' + username+'\nChrootDirectory ' +jail
 
 #Add the necessary data to the sshd file
-if yes_or_no("\nYou will need to add some lines to your sshd_config file for this to work, would you like me to do that?"):
-   ssh_loc = input("Assuming the location is /etc/ssh/sshd_config, please provide alternate path if incorrect: ")
-   if ssh_loc == '':
-     ssh_loc='/etc/ssh/sshd_config'
-
-   file_object = open(ssh_loc,'a')
-   file_object.write(chtext)
-   file_object.close()
-   subprocess.run(['systemctl','restart','sshd'])
-else:
-   print("\nDon't forget to add the following to your sshd config file"+chtext)
+ssh_conf("/etc/ssh/sshd_config",username,jail)
 
 print("\n\nDone!\nBy default you will only be able to write to /root and /backups folder")
