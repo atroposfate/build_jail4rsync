@@ -119,3 +119,4 @@ print("\nFiles needed for the chroot jail have been created in the necessary fol
 ssh_conf("/etc/ssh/sshd_config",username,jail)
 
 print("\n\nDone!\nBy default you will only be able to write to /root and /backups folder")
+return 0
