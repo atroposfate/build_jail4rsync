@@ -66,7 +66,7 @@ def getlibs(program):
    libfiles = re.findall(r"(\/.*?)(?=\s)", libtext)
    return libfiles
 
-#want to tidy up the create user and avoid the uncessary adduser and user useradd
+#want to tidy up the create user and avoid the uncessary adduser and user useradd currently GNDN
 def createuser(uname):
    subprocess.run(['useradd','-m','/home/'+uname,'-p',input("Enter new password"),'-s','/bin/bash',uname])
 
