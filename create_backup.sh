@@ -7,11 +7,12 @@
 DATE=$(date '+%F')
 USER=mybackups
 JAIL=/home/mybackups/backup
+IDENT=myserver
 
 #this is for the mail server but the host name can be changed, initial line checks for old files and deletes them so they don't just pile up on the remote system
-find $JAIL -type f -name 'MailServer_var-*.tar.gz' -mtime +15 -exec rm {} \;
+find $JAIL -type f -name '$IDENT_var-*.tar.gz' -mtime +15 -exec rm {} \;
 #In this example creating seperate files backed for the key folders
 #Could be changed to a simplier "tar -czvf $JAIL/MailServer-$DATE.tar.gz /etc/ /var/ if you want to keep it all in one file
-tar -czvf $JAIL/MailServer_etc-$DATE.tar.gz /etc/
-tar -czvf $JAIL/MailServer_var-$DATE.tar.gz /var/
+tar -czvf $JAIL/$IDENT_etc-$DATE.tar.gz /etc/
+tar -czvf $JAIL/$IDENT_var-$DATE.tar.gz /var/
 chown -R $USER:$USER $JAIL
